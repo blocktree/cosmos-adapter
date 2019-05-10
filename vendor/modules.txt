@@ -1,0 +1,76 @@
+# github.com/asdine/storm v2.1.2+incompatible
+github.com/asdine/storm
+github.com/asdine/storm/codec
+github.com/asdine/storm/codec/json
+github.com/asdine/storm/index
+github.com/asdine/storm/internal
+github.com/asdine/storm/q
+# github.com/astaxie/beego v1.11.1
+github.com/astaxie/beego/config
+github.com/astaxie/beego/logs
+# github.com/blocktree/go-owcdrivers v1.0.0
+github.com/blocktree/go-owcdrivers/addressEncoder
+github.com/blocktree/go-owcdrivers/virtualeconomyTransaction
+github.com/blocktree/go-owcdrivers/addressEncoder/base32PolyMod
+github.com/blocktree/go-owcdrivers/addressEncoder/bech32
+github.com/blocktree/go-owcdrivers/addressEncoder/blake256
+github.com/blocktree/go-owcdrivers/addressEncoder/eip55
+github.com/blocktree/go-owcdrivers/owkeychain
+# github.com/blocktree/go-owcrypt v1.0.0
+github.com/blocktree/go-owcrypt
+# github.com/blocktree/openwallet v1.2.1
+github.com/blocktree/openwallet/log
+github.com/blocktree/openwallet/openw
+github.com/blocktree/openwallet/common
+github.com/blocktree/openwallet/common/file
+github.com/blocktree/openwallet/crypto
+github.com/blocktree/openwallet/hdkeystore
+github.com/blocktree/openwallet/openwallet
+github.com/blocktree/openwallet/timer
+github.com/blocktree/openwallet/crypto/sha3
+github.com/blocktree/openwallet/concurrent
+# github.com/btcsuite/btcd v0.0.0-20190315201642-aa6e0f35703c
+github.com/btcsuite/btcd/btcec
+github.com/btcsuite/btcd/chaincfg
+github.com/btcsuite/btcd/chaincfg/chainhash
+github.com/btcsuite/btcd/wire
+# github.com/btcsuite/btcutil v0.0.0-20190316010144-3ac1210f4b38
+github.com/btcsuite/btcutil/hdkeychain
+github.com/btcsuite/btcutil
+github.com/btcsuite/btcutil/base58
+github.com/btcsuite/btcutil/bech32
+# github.com/ethereum/go-ethereum v1.8.25
+github.com/ethereum/go-ethereum/common
+github.com/ethereum/go-ethereum/common/hexutil
+# github.com/google/uuid v1.0.0
+github.com/google/uuid
+# github.com/gorilla/websocket v1.4.0
+github.com/gorilla/websocket
+# github.com/graarh/golang-socketio v0.0.0-20170510162725-2c44953b9b5f
+github.com/graarh/golang-socketio
+github.com/graarh/golang-socketio/transport
+github.com/graarh/golang-socketio/protocol
+# github.com/imroc/req v0.2.3
+github.com/imroc/req
+# github.com/pborman/uuid v1.2.0
+github.com/pborman/uuid
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24
+github.com/shopspring/decimal
+# github.com/tidwall/gjson v1.2.1
+github.com/tidwall/gjson
+# github.com/tidwall/match v1.0.1
+github.com/tidwall/match
+# github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65
+github.com/tidwall/pretty
+# go.etcd.io/bbolt v1.3.2
+go.etcd.io/bbolt
+# golang.org/x/crypto v0.0.0-20190404164418-38d8ce5564a5
+golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/scrypt
+golang.org/x/crypto/sha3
+golang.org/x/crypto/ripemd160
+# golang.org/x/sys v0.0.0-20190403152447-81d4e9dc473e
+golang.org/x/sys/unix
+golang.org/x/sys/cpu
