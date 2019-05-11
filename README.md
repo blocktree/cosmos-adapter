@@ -30,7 +30,7 @@ mainnetDenom = "uatom"
 # testnet rest api url
 testnetRestAPI = "http://192.168.27.124:20042"
 # testnet node api url
-testNodeAPI = "http://192.168.27.124:20041"
+testnetNodeAPI = "http://192.168.27.124:20041"
 # chain id
 testnetChainID = "gaia-13003"
 # testnet denom
