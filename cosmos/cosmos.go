@@ -651,7 +651,7 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 	wm.Config.MinFee = uint64(minFee)
 	stdGas, _ := c.Int("stdGas")
 	wm.Config.StdGas = uint64(stdGas)
-
+	wm.Config.IsScanMemPool, _ = c.Bool("isScanMemPool")
 	return nil
 }
 

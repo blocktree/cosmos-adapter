@@ -76,7 +76,7 @@ func NewATOMBlockScanner(wm *WalletManager) *ATOMBlockScanner {
 
 	bs.extractingCH = make(chan struct{}, maxExtractingSize)
 	bs.wm = wm
-	bs.IsScanMemPool = false
+	bs.IsScanMemPool = bs.wm.Config.IsScanMemPool
 	bs.RescanLastBlockCount = 0
 
 	//设置扫描任务

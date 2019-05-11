@@ -105,6 +105,8 @@ type WalletConfig struct {
 	MinFee uint64
 	// gas standed
 	StdGas uint64
+	// scan mem pool or not
+	IsScanMemPool bool
 }
 
 func NewConfig(symbol string, masterKey string) *WalletConfig {

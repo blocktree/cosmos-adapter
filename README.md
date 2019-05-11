@@ -36,9 +36,11 @@ testnetChainID = "gaia-13003"
 # testnet denom
 testnetDenom = "muon"
 
-
 # Is network test?
 isTestNet = true
+
+# scan mempool or not
+isScanMemPool = false
 
 # pay fee or not
 payFee = false
