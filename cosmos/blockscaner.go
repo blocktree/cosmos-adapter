@@ -568,87 +568,97 @@ func (bs *ATOMBlockScanner) extractTransaction(trx *Transaction, result *Extract
 			toArray := []string{}
 			amountCount := uint64(0)
 			fee := "0"
+
+			status := "1"
+			reason := ""
+
 			for i, tx := range trx.TxValue {
-				if tx.Status == "true" {
-					from = tx.From
-					sourceKey, ok := scanAddressFunc(from)
-					if ok {
-						input := openwallet.TxInput{}
-						input.TxID = trx.TxID
-						input.Address = from
-						input.Amount = convertToAmount(tx.Amount)
-						amountCount += tx.Amount
-						fromArray = append(fromArray, from+":"+input.Amount)
-						toArray = append(toArray, tx.To+":"+input.Amount)
-						input.Coin = openwallet.Coin{
-							Symbol:     bs.wm.Symbol(),
-							IsContract: false,
-						}
-						input.Index = uint64(inputindex)
-						inputindex++
-						input.Sid = openwallet.GenTxInputSID(trx.TxID, bs.wm.Symbol(), "", input.Index)
-						input.CreateAt = createAt
-						input.BlockHeight = trx.BlockHeight
-						input.BlockHash = blockhash
-						input.IsMemo = true
-						input.Memo = trx.Memo
-						ed := result.extractData[sourceKey]
-						if ed == nil {
-							ed = openwallet.NewBlockExtractData()
-							result.extractData[sourceKey] = ed
-						}
-						ed.TxInputs = append(ed.TxInputs, &input)
+				//	if tx.Status == "true" {
 
-						if trx.Fee != nil {
-							tmp := *&input
-							feeCharge := &tmp
-							feeCharge.Amount = convertToAmount(trx.Fee[i].Amount)
-							fee = feeCharge.Amount
-							fee = feeCharge.Amount
-							feeCharge.Index = uint64(inputindex)
-							inputindex++
-							feeCharge.Sid = openwallet.GenTxInputSID(trx.TxID, bs.wm.Symbol(), "", feeCharge.Index)
-							ed.TxInputs = append(ed.TxInputs, feeCharge)
-						}
+				if tx.Status != "true" {
+					status = "0"
+					reason = tx.Reason
+				}
+
+				from = tx.From
+				sourceKey, ok := scanAddressFunc(from)
+				if ok {
+					input := openwallet.TxInput{}
+					input.TxID = trx.TxID
+					input.Address = from
+					input.Amount = convertToAmount(tx.Amount)
+					amountCount += tx.Amount
+					fromArray = append(fromArray, from+":"+input.Amount)
+					toArray = append(toArray, tx.To+":"+input.Amount)
+					input.Coin = openwallet.Coin{
+						Symbol:     bs.wm.Symbol(),
+						IsContract: false,
 					}
+					input.Index = uint64(inputindex)
+					inputindex++
+					input.Sid = openwallet.GenTxInputSID(trx.TxID, bs.wm.Symbol(), "", input.Index)
+					input.CreateAt = createAt
+					input.BlockHeight = trx.BlockHeight
+					input.BlockHash = blockhash
+					input.IsMemo = true
+					input.Memo = trx.Memo
+					ed := result.extractData[sourceKey]
+					if ed == nil {
+						ed = openwallet.NewBlockExtractData()
+						result.extractData[sourceKey] = ed
+					}
+					ed.TxInputs = append(ed.TxInputs, &input)
 
-					to = tx.To
-					sourceKey, ok = scanAddressFunc(to)
-					if ok {
-						isReceived = true
-						output := openwallet.TxOutPut{}
-						output.Received = true
-						output.TxID = trx.TxID
-						output.Address = to
-						output.Amount = convertToAmount(tx.Amount)
-						output.IsMemo = true
-						output.Memo = trx.Memo
-						toArray = append(toArray, to+":"+output.Amount)
-						fromArray = append(fromArray, tx.From+":"+output.Amount)
-						amountCount += tx.Amount
-						output.Coin = openwallet.Coin{
-							Symbol:     bs.wm.Symbol(),
-							IsContract: false,
-						}
-						output.Index = uint64(i)
-						output.Sid = openwallet.GenTxOutPutSID(trx.TxID, bs.wm.Symbol(), "", output.Index)
-						output.CreateAt = createAt
-						output.BlockHeight = trx.BlockHeight
-						output.BlockHash = blockhash
-						ed := result.extractData[sourceKey]
-						if ed == nil {
-							ed = openwallet.NewBlockExtractData()
-							result.extractData[sourceKey] = ed
-						}
-
-						ed.TxOutputs = append(ed.TxOutputs, &output)
+					if trx.Fee != nil {
+						tmp := *&input
+						feeCharge := &tmp
+						feeCharge.Amount = convertToAmount(trx.Fee[i].Amount)
+						fee = feeCharge.Amount
+						fee = feeCharge.Amount
+						feeCharge.Index = uint64(inputindex)
+						inputindex++
+						feeCharge.Sid = openwallet.GenTxInputSID(trx.TxID, bs.wm.Symbol(), "", feeCharge.Index)
+						ed.TxInputs = append(ed.TxInputs, feeCharge)
 					}
 				}
+
+				to = tx.To
+				sourceKey, ok = scanAddressFunc(to)
+				if ok {
+					isReceived = true
+					output := openwallet.TxOutPut{}
+					output.Received = true
+					output.TxID = trx.TxID
+					output.Address = to
+					output.Amount = convertToAmount(tx.Amount)
+					output.IsMemo = true
+					output.Memo = trx.Memo
+					toArray = append(toArray, to+":"+output.Amount)
+					fromArray = append(fromArray, tx.From+":"+output.Amount)
+					amountCount += tx.Amount
+					output.Coin = openwallet.Coin{
+						Symbol:     bs.wm.Symbol(),
+						IsContract: false,
+					}
+					output.Index = uint64(i)
+					output.Sid = openwallet.GenTxOutPutSID(trx.TxID, bs.wm.Symbol(), "", output.Index)
+					output.CreateAt = createAt
+					output.BlockHeight = trx.BlockHeight
+					output.BlockHash = blockhash
+					ed := result.extractData[sourceKey]
+					if ed == nil {
+						ed = openwallet.NewBlockExtractData()
+						result.extractData[sourceKey] = ed
+					}
+
+					ed.TxOutputs = append(ed.TxOutputs, &output)
+				}
+				//	}
 			}
 
 			for _, extractData := range result.extractData {
-				status := "1"
-				reason := ""
+				// status := "1"
+				// reason := ""
 
 				tx := &openwallet.Transaction{
 					From:   fromArray,
