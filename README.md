@@ -23,7 +23,7 @@ mainnetRestAPI = "http://127.0.0.1:1317"
 # mainnet node api url
 mainnetNodeAPI = "http://127.0.0.1:26657"
 # chain id
-mainnetChainID = "cosmohub-2"
+mainnetChainID = "cosmoshub-2"
 # mainnet denom
 mainnetDenom = "uatom"
 
