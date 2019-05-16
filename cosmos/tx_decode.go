@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/blocktree/go-owcdrivers/cosmosTransaction"
-	"github.com/blocktree/go-owcdrivers/virtualeconomyTransaction"
 	owcrypt "github.com/blocktree/go-owcrypt"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
@@ -419,8 +418,11 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 
 func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.WalletDAI, rawTx *openwallet.RawTransaction, addrBalance *openwallet.Balance) error {
 
-	fee := uint64(0)      //decoder.wm.Config.FeeCharge
-	feeScale := uint64(0) //decoder.wm.Config.FeeScale
+	gas := decoder.wm.Config.StdGas
+	fee := uint64(0) //decoder.wm.Config.FeeCharge
+	if decoder.wm.Config.PayFee {
+		fee = decoder.wm.Config.MinFee
+	}
 
 	var amountStr, to string
 	for k, v := range rawTx.To {
@@ -436,7 +438,7 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 	if err != nil {
 		return err
 	}
-	fromPubkey := fromAddr.PublicKey
+	//fromPubkey := fromAddr.PublicKey
 
 	rawTx.TxFrom = []string{from}
 	rawTx.TxTo = []string{to}
@@ -444,22 +446,20 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 	rawTx.Fees = convertToAmount(fee)
 	rawTx.FeeRate = convertToAmount(fee)
 
-	publicKey, _ := hex.DecodeString(fromPubkey)
-	_, err = owcrypt.CURVE25519_convert_Ed_to_X(publicKey)
+	denom := decoder.wm.Config.Denom
+	chainID := decoder.wm.Config.ChainID
+	accountNumber, sequence, err := decoder.wm.RestClient.getAccountNumberAndSequence(from)
 	if err != nil {
 		return err
 	}
-	fromPubkey = "Encode(xpub, BitcoinAlphabet)"
+	memo := ""
 
-	txStruct := virtualeconomyTransaction.TxStruct{
-		TxType:     virtualeconomyTransaction.TxTypeTransfer,
-		To:         to,
-		Amount:     convertFromAmount(amountStr),
-		Fee:        fee,
-		FeeScale:   uint16(feeScale),
-		Attachment: "",
-	}
-	emptyTrans, err := virtualeconomyTransaction.CreateEmptyTransaction(txStruct)
+	messageType := decoder.wm.Config.MsgType
+
+	txFee := cosmosTransaction.NewStdFee(int64(gas), cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(fee))})
+	message := []cosmosTransaction.Message{cosmosTransaction.NewMessage(messageType, cosmosTransaction.NewMsgSend(from, to, cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(convertFromAmount(amountStr)))}))}
+	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, sequence, &txFee, message)
+	emptyTrans, hash, err := txStruct.CreateEmptyTransactionAndHash()
 	if err != nil {
 		return err
 	}
@@ -475,7 +475,7 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 		EccType: decoder.wm.Config.CurveType,
 		Nonce:   "",
 		Address: fromAddr,
-		Message: emptyTrans,
+		Message: hash,
 	}
 
 	keySigs = append(keySigs, &signature)
