@@ -6,7 +6,7 @@ require (
 	github.com/acroca/go-symbols v0.1.1 // indirect
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/astaxie/beego v1.11.1
-	github.com/blocktree/go-owcdrivers v1.0.6
+	github.com/blocktree/go-owcdrivers v1.0.7
 	github.com/blocktree/go-owcrypt v1.0.1
 	github.com/blocktree/openwallet v1.4.1
 	github.com/ethereum/go-ethereum v1.8.25
