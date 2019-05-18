@@ -45,6 +45,7 @@ type TxValue struct {
 	To     string
 	Amount uint64
 	Status string
+	Reason string
 	// Denom  string
 }
 
@@ -75,6 +76,12 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 	msgList := json.Get("tx").Get("value").Get("msg").Array()
 	feeList := json.Get("tx").Get("value").Get("fee").Get("amount").Array()
 	logList := json.Get("logs").Array()
+	reason := ""
+	status := "true"
+	if logList == nil || len(logList) == 0 {
+		reason = gjson.Get(json.Get("raw_log").String(), "message").String()
+		status = "false"
+	}
 	for i, msg := range msgList {
 		if msg.Get("type").String() == msgType {
 			for _, coin := range msg.Get("value").Get("amount").Array() {
@@ -83,11 +90,12 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 						From:   msg.Get("value").Get("from_address").String(),
 						To:     msg.Get("value").Get("to_address").String(),
 						Amount: coin.Get("amount").Uint(),
-						Status: logList[i].Get("success").String(),
+						Status: status,
+						Reason: reason,
 					})
 
 					if feeList != nil && len(feeList) > 0 {
-						obj.Fee = append(obj.Fee, FeeValue{feeList[i].Uint()})
+						obj.Fee = append(obj.Fee, FeeValue{feeList[i].Get("amount").Uint()})
 					} else {
 						obj.Fee = nil
 					}
