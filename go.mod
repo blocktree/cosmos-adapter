@@ -10,6 +10,7 @@ require (
 	github.com/blocktree/go-owcrypt v1.0.1
 	github.com/blocktree/openwallet v1.4.1
 	github.com/ethereum/go-ethereum v1.8.25
+	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/graarh/golang-socketio v0.0.0-20170510162725-2c44953b9b5f
 	github.com/imroc/req v0.2.3
 	github.com/mdempsky/gocode v0.0.0-20190203001940-7fb65232883f // indirect
