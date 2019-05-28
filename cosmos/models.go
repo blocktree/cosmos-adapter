@@ -19,6 +19,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"time"
 
 	owcrypt "github.com/blocktree/go-owcrypt"
@@ -66,6 +67,7 @@ type Transaction struct {
 }
 
 func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transaction {
+
 	obj := &Transaction{}
 	obj.TxType = json.Get("tx").Get("type").String()
 	if obj.TxType != txType {
@@ -76,7 +78,13 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 	feeList := json.Get("tx").Get("value").Get("fee").Get("amount").Array()
 	logList := json.Get("logs").Array()
 	reason := ""
-	status := "true"
+	var status string
+
+	if strings.Contains(json.Get("raw_log").String(), "true") {
+		status = "true"
+	} else {
+		status = "false"
+	}
 	if logList == nil || len(logList) == 0 {
 		reason = gjson.Get(json.Get("raw_log").String(), "message").String()
 		status = "false"

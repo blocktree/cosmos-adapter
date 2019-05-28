@@ -202,9 +202,7 @@ func (c *Client) getAccountNumberAndSequence(address string) (int, int, error) {
 	if accountNumber == 0 {
 		return 0, 0, errors.New("Failed to get account number, or node sync is stoped!")
 	}
-	// if sequence == 0 {
-	// 	sequence = 1
-	// }
+
 	return accountNumber, sequence, nil
 }
 
@@ -259,20 +257,34 @@ func (c *Client) getBlockByHeight(height uint64) (*Block, error) {
 }
 
 func (c *Client) sendTransaction(jsonStr string) (string, error) {
+
+	// sequence := gjson.Get(jsonStr, "tx").Get("signatures").Array()[0].Get("sequence").Uint()
+	// from := gjson.Get(jsonStr, "tx").Get("msg").Array()[0].Get("value").Get("from_address").String()
 	path := "/txs"
 
 	var dat map[string]interface{}
 	json.Unmarshal([]byte(jsonStr), &dat)
 
-	// request := []interface{}{
-	// 	jsonStr,
-	// }
-
 	resp, err := c.Call(path, req.BodyJSON(&dat), "POST")
-
 	if err != nil {
 		return "", err
 	}
+	if resp.Get("code").Uint() != 0 && resp.Get("raw_log").String() != "" {
+		return "", errors.New("send transaction failed with error:" + resp.Get("raw_log").String())
+	}
 
+	// timeCount := 1
+	// for {
+	// 	time.Sleep(time.Second * 5)
+	// 	_, sequenceNew, _ := c.getAccountNumberAndSequence(from)
+	// 	if sequenceNew > int(sequence) {
+	// 		break
+	// 	} else {
+	// 		timeCount++
+	// 		if timeCount == 120 {
+	// 			return "", errors.New("Submit transaction failed!")
+	// 		}
+	// 	}
+	// }
 	return resp.Get("txhash").String(), nil
 }

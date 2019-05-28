@@ -27,8 +27,10 @@ import (
 
 	"github.com/blocktree/go-owcdrivers/cosmosTransaction"
 	owcrypt "github.com/blocktree/go-owcrypt"
+	ow "github.com/blocktree/openwallet/common"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
+	"github.com/tidwall/gjson"
 )
 
 type TransactionDecoder struct {
@@ -71,6 +73,9 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 	if err != nil {
 		fmt.Println("Tx to send: ", rawTx.RawHex)
 		return nil, err
+	} else {
+		sequence := gjson.Get(rawTx.RawHex, "tx").Get("signatures").Array()[0].Get("sequence").Uint() + 1
+		wrapper.SetAddressExtParam(gjson.Get(rawTx.RawHex, "tx").Get("msg").Array()[0].Get("value").Get("from_address").String(), decoder.wm.FullName(), sequence)
 	}
 
 	rawTx.TxID = txid
@@ -176,9 +181,22 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 
 	denom := decoder.wm.Config.Denom
 	chainID := decoder.wm.Config.ChainID
-	accountNumber, sequence, err := decoder.wm.RestClient.getAccountNumberAndSequence(from)
+	var sequence uint64
+	sequence_db, err := wrapper.GetAddressExtParam(from, decoder.wm.FullName())
 	if err != nil {
 		return err
+	}
+	if sequence_db == nil {
+		sequence = 0
+	} else {
+		sequence = ow.NewString(sequence_db).UInt64()
+	}
+	accountNumber, sequenceChain, err := decoder.wm.RestClient.getAccountNumberAndSequence(from)
+	if err != nil {
+		return err
+	}
+	if sequenceChain > int(sequence) {
+		sequence = uint64(sequenceChain)
 	}
 	memo := ""
 
@@ -186,7 +204,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 
 	txFee := cosmosTransaction.NewStdFee(int64(gas), cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(fee))})
 	message := []cosmosTransaction.Message{cosmosTransaction.NewMessage(messageType, cosmosTransaction.NewMsgSend(from, to, cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(convertFromAmount(amountStr)))}))}
-	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, sequence, &txFee, message)
+	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, int(sequence), &txFee, message)
 
 	emptyTrans, hash, err := txStruct.CreateEmptyTransactionAndHash()
 	if err != nil {
@@ -292,7 +310,7 @@ func (decoder *TransactionDecoder) VerifyATOMRawTransaction(wrapper openwallet.W
 	var txStruct cosmosTransaction.TxStruct
 	json.Unmarshal([]byte(emptyTrans), &txStruct)
 	keyType := "tendermint/PubKeySecp256k1"
-	snedmode := "async" //"block"
+	snedmode := "sync" //"block"
 	signedTrans, err := txStruct.CreateJsonForSend(signature, pubkey, keyType, snedmode)
 
 	if err != nil {
@@ -448,9 +466,22 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 
 	denom := decoder.wm.Config.Denom
 	chainID := decoder.wm.Config.ChainID
-	accountNumber, sequence, err := decoder.wm.RestClient.getAccountNumberAndSequence(from)
+	var sequence uint64
+	sequence_db, err := wrapper.GetAddressExtParam(from, decoder.wm.FullName())
 	if err != nil {
 		return err
+	}
+	if sequence_db == nil {
+		sequence = 0
+	} else {
+		sequence = ow.NewString(sequence_db).UInt64()
+	}
+	accountNumber, sequenceChain, err := decoder.wm.RestClient.getAccountNumberAndSequence(from)
+	if err != nil {
+		return err
+	}
+	if sequenceChain > int(sequence) {
+		sequence = uint64(sequenceChain)
 	}
 	memo := ""
 
@@ -458,7 +489,7 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 
 	txFee := cosmosTransaction.NewStdFee(int64(gas), cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(fee))})
 	message := []cosmosTransaction.Message{cosmosTransaction.NewMessage(messageType, cosmosTransaction.NewMsgSend(from, to, cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(convertFromAmount(amountStr)))}))}
-	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, sequence, &txFee, message)
+	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, int(sequence), &txFee, message)
 	emptyTrans, hash, err := txStruct.CreateEmptyTransactionAndHash()
 	if err != nil {
 		return err

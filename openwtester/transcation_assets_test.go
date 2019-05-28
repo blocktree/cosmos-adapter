@@ -16,8 +16,10 @@
 package openwtester
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/blocktree/cosmos-adapter/cosmos"
 	"github.com/blocktree/openwallet/openw"
 
 	"github.com/blocktree/openwallet/log"
@@ -120,13 +122,14 @@ func testSubmitTransactionStep(tm *openw.WalletManager, rawTx *openwallet.RawTra
 
 func TestTransfer(t *testing.T) {
 	tm := testInitWalletManager()
-	walletID := "WCPa2UFFUt5HAXPHbzwWty5x3NJpEeBRHY"
-	accountID := "8WivbG5nnxGEn9kruuWa7NKQWWSyzjTuUhZMJaExC5Pq"
-	to := "cosmos1xv66sa5tlplm68j4fec6stdzszg3pcvswag06j"
+	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
+	accountID := "4TWktj4La9AqL6DTEuUFhzkXQcrBnW1qBeZmtj1g5eKg"
+	to := "cosmos1eyqnh4ulw9dvyagchhc06mrelcvyh45ppne6ju"
+	//to := "cosmos1u03rh4fk8wf4umdn6wzu5pqs83vjg85t6zmmql"
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.1", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.01", "", nil)
 	if err != nil {
 		return
 	}
@@ -146,6 +149,91 @@ func TestTransfer(t *testing.T) {
 	_, err = testSubmitTransactionStep(tm, rawTx)
 	if err != nil {
 		return
+	}
+
+	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.02", "", nil)
+	if err != nil {
+		return
+	}
+
+	log.Std.Info("rawTx: %+v", rawTx)
+
+	_, err = testSignTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testVerifyTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testSubmitTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
+	if err != nil {
+		return
+	}
+
+	log.Std.Info("rawTx: %+v", rawTx)
+
+	_, err = testSignTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testVerifyTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testSubmitTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
+	if err != nil {
+		return
+	}
+
+	log.Std.Info("rawTx: %+v", rawTx)
+
+	_, err = testSignTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testVerifyTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+
+	_, err = testSubmitTransactionStep(tm, rawTx)
+	if err != nil {
+		return
+	}
+	//	getdata("cosmos1z9k73l7trgshqpgg7m6hk9ehe4gphea5ch9dyh")
+
+}
+func getdata(addr string) {
+	c := cosmos.NewClient("http://47.112.139.225:20001", false)
+	path := "/auth/accounts/" + addr
+	for {
+		r, _ := c.Call(path, nil, "GET")
+
+		accountNumber := int(r.Get("value").Get("account_number").Uint())
+		sequence := int(r.Get("value").Get("sequence").Uint())
+		fmt.Println("accountNumber : ", accountNumber)
+		fmt.Println("sequence : ", sequence)
+
+		resp, _ := c.Call("/blocks/latest", nil, "GET")
+
+		height := resp.Get("block_meta").Get("header").Get("height").Uint()
+		fmt.Println("height : ", height)
 	}
 
 }
