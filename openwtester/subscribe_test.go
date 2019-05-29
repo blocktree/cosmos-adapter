@@ -50,6 +50,39 @@ func (sub *subscriberSingle) BlockExtractDataNotify(sourceKey string, data *open
 
 	log.Std.Notice("data.Transaction: %+v", data.Transaction)
 
+
+	symbol := "ATOM"
+	assetsMgr, err := openw.GetAssetsAdapter(symbol)
+	if err != nil {
+		log.Error(symbol, "is not support")
+		return nil
+	}
+	//读取配置
+	absFile := filepath.Join(configFilePath, symbol+".ini")
+
+	c, err := config.NewConfig("ini", absFile)
+	if err != nil {
+		return nil
+	}
+	assetsMgr.LoadAssetsConfig(c)
+	bs := assetsMgr.GetBlockScanner()
+
+	addrs := []string{
+		"cosmos1xxhqkxgxuhwsmzhffhqsxyn6r7wqcfwlmyw9m3",
+	}
+
+	balances, err := bs.GetBalanceByAddress(addrs...)
+	if err != nil {
+		log.Errorf(err.Error())
+		return nil
+	}
+	for _, b := range balances {
+		log.Infof("balance[%s] = %s", b.Address, b.Balance)
+		log.Infof("UnconfirmBalance[%s] = %s", b.Address, b.UnconfirmBalance)
+		log.Infof("ConfirmBalance[%s] = %s", b.Address, b.ConfirmBalance)
+	}
+
+
 	return nil
 }
 
@@ -60,8 +93,8 @@ func TestSubscribeAddress(t *testing.T) {
 		symbol     = "ATOM"
 		//accountID  = "FUAKFujfVwdWJn79DFB4ZZQ6LRZS5cXfrGC9er2T5TSt"
 		addrs      = map[string]string{
-			"cosmos1nm0kmux58xz2k02we8k668x7r6wzrj04avd3r6": "sender",
-			"cosmos12heec7njefpf8h9ay8vj68htz7gphdyud54a37": "sender",
+			"cosmos1xxhqkxgxuhwsmzhffhqsxyn6r7wqcfwlmyw9m3": "sender",
+			//"cosmos12heec7njefpf8h9ay8vj68htz7gphdyud54a37": "sender",
 		}
 	)
 
@@ -96,7 +129,7 @@ func TestSubscribeAddress(t *testing.T) {
 
 	//log.Debug("already got scanner:", assetsMgr)
 	scanner := assetsMgr.GetBlockScanner()
-	scanner.SetRescanBlockHeight(260370)
+	scanner.SetRescanBlockHeight(418972)
 
 	if scanner == nil {
 		log.Error(symbol, "is not support block scan")

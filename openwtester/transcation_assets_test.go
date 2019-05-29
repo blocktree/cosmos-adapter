@@ -16,6 +16,8 @@
 package openwtester
 
 import (
+	"github.com/astaxie/beego/config"
+	"path/filepath"
 	"testing"
 
 	"github.com/blocktree/openwallet/openw"
@@ -123,7 +125,7 @@ func TestTransfer(t *testing.T) {
 	walletID := "WAZgi4Vs3C3bWyDqYWfXu8nZLtCfgxZrha"
 	accountID := "9nmwmxcuaGiZB2GXdUAJBfR5ao3XTgf2aGNwj7SaytqG"
 	//to := "cosmos1xv66sa5tlplm68j4fec6stdzszg3pcvswag06j"
-	to := "cosmos1urgd0qhlrcw5zgmz2fq76pyan0tjkg499mxvsg"
+	to := "cosmos1ltzy3fx2drnufvet9k5g6cdvuqft3jrya74fxs"
 
 	//accountID := "5jURj45wA8tKjHFuTzRqNzcxamxBSeUNgqna7Cy1ZetB"
 	//to := "cosmos1xxhqkxgxuhwsmzhffhqsxyn6r7wqcfwlmyw9m3"
@@ -150,6 +152,37 @@ func TestTransfer(t *testing.T) {
 	_, err = testSubmitTransactionStep(tm, rawTx)
 	if err != nil {
 		return
+	}
+
+	symbol := "ATOM"
+	assetsMgr, err := openw.GetAssetsAdapter(symbol)
+	if err != nil {
+		log.Error(symbol, "is not support")
+		return
+	}
+	//读取配置
+	absFile := filepath.Join(configFilePath, symbol+".ini")
+
+	c, err := config.NewConfig("ini", absFile)
+	if err != nil {
+		return
+	}
+	assetsMgr.LoadAssetsConfig(c)
+	bs := assetsMgr.GetBlockScanner()
+
+	addrs := []string{
+		"cosmos1xxhqkxgxuhwsmzhffhqsxyn6r7wqcfwlmyw9m3",
+	}
+
+	balances, err := bs.GetBalanceByAddress(addrs...)
+	if err != nil {
+		log.Errorf(err.Error())
+		return
+	}
+	for _, b := range balances {
+		log.Infof("balance[%s] = %s", b.Address, b.Balance)
+		log.Infof("UnconfirmBalance[%s] = %s", b.Address, b.UnconfirmBalance)
+		log.Infof("ConfirmBalance[%s] = %s", b.Address, b.ConfirmBalance)
 	}
 
 }
