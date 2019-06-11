@@ -107,5 +107,7 @@ func (wm *WalletManager) sendRawTransactionByNode(txHex string) (string, error) 
 		fmt.Println(err)
 		return "", err
 	}
+
+	
 	return txid, nil
 }
