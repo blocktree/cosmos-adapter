@@ -395,6 +395,9 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 		//this.wm.Log.Debug("sumAmount:", sumAmount)
 		//计算手续费
 		fee := big.NewInt(0) //(int64(decoder.wm.Config.FeeCharge))
+		if decoder.wm.Config.PayFee {
+			fee = big.NewInt((int64(decoder.wm.Config.MinFee)))
+		}
 
 		//减去手续费
 		sumAmount_BI.Sub(sumAmount_BI, fee)
