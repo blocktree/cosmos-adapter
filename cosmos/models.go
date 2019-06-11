@@ -89,7 +89,6 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 		reason = gjson.Get(json.Get("raw_log").String(), "message").String()
 		status = "false"
 	}
-	i := int(0)
 	for _, msg := range msgList {
 		if msg.Get("type").String() == msgType {
 			for _, coin := range msg.Get("value").Get("amount").Array() {
@@ -103,8 +102,7 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 					})
 
 					if feeList != nil && len(feeList) > 0 {
-						obj.Fee = append(obj.Fee, FeeValue{feeList[i].Get("amount").Uint()})
-						i++
+						obj.Fee = append(obj.Fee, FeeValue{feeList[0].Get("amount").Uint()})
 					} else {
 						obj.Fee = nil
 					}
