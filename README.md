@@ -49,5 +49,6 @@ minFee = 1000
 # standed gas
 stdGas = 200000
 
-
+# Cache data file directory, default = "", current directory: ./data
+dataDir = ""
 ```

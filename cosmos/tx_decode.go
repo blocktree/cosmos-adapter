@@ -131,8 +131,12 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 
 	fee := uint64(0)
 	gas := decoder.wm.Config.StdGas
-	if decoder.wm.Config.PayFee {
-		fee = decoder.wm.Config.MinFee
+	if len(rawTx.FeeRate) > 0 {
+		fee = convertFromAmount(rawTx.FeeRate)
+	} else {
+		if decoder.wm.Config.PayFee {
+			fee = decoder.wm.Config.MinFee
+		}
 	}
 	// fee := big.NewInt(int64(decoder.wm.Config.FeeCharge))
 
@@ -395,8 +399,12 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 		//this.wm.Log.Debug("sumAmount:", sumAmount)
 		//计算手续费
 		fee := big.NewInt(0) //(int64(decoder.wm.Config.FeeCharge))
-		if decoder.wm.Config.PayFee {
-			fee = big.NewInt((int64(decoder.wm.Config.MinFee)))
+		if len(sumRawTx.FeeRate) > 0 {
+			fee = big.NewInt(int64(convertFromAmount(sumRawTx.FeeRate)))
+		} else {
+			if decoder.wm.Config.PayFee {
+				fee = big.NewInt((int64(decoder.wm.Config.MinFee)))
+			}
 		}
 
 		//减去手续费
