@@ -18,7 +18,6 @@ package cosmos
 import (
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"math/big"
 	"sort"
@@ -109,7 +108,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 	}
 
 	if len(addresses) == 0 {
-		return fmt.Errorf("No addresses found in wallet [%s]", rawTx.Account.AccountID)
+		return openwallet.Errorf(openwallet.ErrAccountNotAddress, "[%s] have not addresses", rawTx.Account.AccountID)
 	}
 
 	addressesBalanceList := make([]AddrBalance, 0, len(addresses))
@@ -173,8 +172,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 	}
 
 	if from == "" {
-		log.Error("No enough ATOM to send!")
-		return errors.New("No enough ATOM to send!")
+		return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "the balance: %s is not enough", amountStr)
 	}
 
 	rawTx.TxFrom = []string{from}
