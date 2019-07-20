@@ -679,7 +679,7 @@ func (bs *ATOMBlockScanner) extractTransaction(trx *Transaction, result *Extract
 					IsMemo:      true,
 					Memo:        trx.Memo,
 					Received:    isReceived,
-					TxType:      1,
+					TxType:      0,
 				}
 				wxID := openwallet.GenTransactionWxID(tx)
 				tx.WxID = wxID
