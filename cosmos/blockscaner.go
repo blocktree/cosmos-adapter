@@ -550,6 +550,7 @@ func convertFromAmount(amountStr string) uint64 {
 func (bs *ATOMBlockScanner) extractTransaction(trx *Transaction, result *ExtractResult, scanAddressFunc openwallet.BlockScanAddressFunc) {
 	var (
 		success = true
+		multiindex = uint64(0)
 	)
 	createAt := time.Now().Unix()
 	if trx == nil {
@@ -639,7 +640,13 @@ func (bs *ATOMBlockScanner) extractTransaction(trx *Transaction, result *Extract
 						Symbol:     bs.wm.Symbol(),
 						IsContract: false,
 					}
-					output.Index = uint64(i)
+					if tx.From == "multiaddress" {
+						output.Index = multiindex
+						multiindex ++
+					} else {
+						output.Index = uint64(i)
+					}
+
 					output.Sid = openwallet.GenTxOutPutSID(trx.TxID, bs.wm.Symbol(), "", output.Index)
 					output.CreateAt = createAt
 					output.BlockHeight = trx.BlockHeight

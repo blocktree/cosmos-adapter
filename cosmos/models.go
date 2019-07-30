@@ -110,6 +110,40 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 			}
 
 		}
+		if msg.Get("type").String() == "cosmos-sdk/MsgMultiSend" {
+			for _, input := range msg.Get("value").Get("inputs").Array() {
+				for _, coin := range input.Get("coins").Array() {
+					if coin.Get("denom").String() == denom {
+						obj.TxValue = append(obj.TxValue, TxValue{
+							From: input.Get("address").String(),
+							To:   "multiaddress",
+							Amount: coin.Get("amount").Uint(),
+							Status: status,
+							Reason:reason,
+						})
+					}
+				}
+			}
+
+			for _, output := range msg.Get("value").Get("outputs").Array() {
+				for _, coin := range output.Get("coins").Array() {
+					if coin.Get("denom").String() == denom {
+						obj.TxValue = append(obj.TxValue, TxValue{
+							From: "multiaddress",
+							To: output.Get("address").String(),
+							Amount: coin.Get("amount").Uint(),
+							Status: status,
+							Reason:reason,
+						})
+					}
+				}
+			}
+			if feeList != nil && len(feeList) > 0 {
+				obj.Fee = append(obj.Fee, FeeValue{feeList[0].Get("amount").Uint()})
+			} else {
+				obj.Fee = nil
+			}
+		}
 	}
 	obj.Gas = json.Get("tx").Get("value").Get("fee").Get("gas").Uint()
 	obj.TxID = json.Get("txhash").String()
