@@ -633,8 +633,27 @@ func (bs *ATOMBlockScanner) extractTransaction(trx *Transaction, result *Extract
 					output.Amount = convertToAmount(tx.Amount)
 					output.IsMemo = true
 					output.Memo = trx.Memo
-					toArray = append(toArray, to+":"+output.Amount)
-					fromArray = append(fromArray, tx.From+":"+output.Amount)
+
+					notified := false
+
+					for _, v := range fromArray {
+						if v == tx.From+":"+output.Amount {
+							notified = true
+						}
+					}
+					if !notified {
+						fromArray = append(fromArray, tx.From+":"+output.Amount)
+					}
+					notified = false
+					for _, v := range toArray {
+						if v == to+":"+output.Amount {
+							notified = true
+						}
+					}
+					if !notified {
+						toArray = append(toArray, to+":"+output.Amount)
+					}
+
 					amountCount += tx.Amount
 					output.Coin = openwallet.Coin{
 						Symbol:     bs.wm.Symbol(),
