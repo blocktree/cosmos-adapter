@@ -12,6 +12,9 @@ import (
 var (
 	testApp        = "assets-adapter"
 	configFilePath = filepath.Join("conf")
+	dbFilePath = filepath.Join("data", "db")
+	dbFileName = "blockchain-ATOM.db"
+
 )
 
 func testInitWalletManager() *openw.WalletManager {
@@ -129,7 +132,7 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 	tm := testInitWalletManager()
 
 	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
-	accountID := "4TWktj4La9AqL6DTEuUFhzkXQcrBnW1qBeZmtj1g5eKg"
+	accountID := "55VyfKAycMRRSY8t3jpH97a1EwSikfe5N9h69wfF4ETH"
 	list, err := tm.GetAddressList(testApp, walletID, accountID, 0, -1, false)
 	if err != nil {
 		log.Error("unexpected error:", err)
