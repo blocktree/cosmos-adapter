@@ -17,12 +17,12 @@ package cosmos
 
 import (
 	"fmt"
-	"path/filepath"
+	//"path/filepath"
 	"testing"
 
-	"github.com/asdine/storm"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	//"github.com/asdine/storm"
+	//"github.com/blocktree/openwallet/log"
+	//"github.com/blocktree/openwallet/openwallet"
 	"github.com/pborman/uuid"
 )
 
@@ -52,11 +52,11 @@ func TestGetBlockHeight(t *testing.T) {
 	t.Logf("GetBlockHeight height = %d \n", height)
 }
 
-func TestGetLocalNewBlock(t *testing.T) {
-	height, hash, _ := tw.GetLocalNewBlock()
-	t.Logf("GetLocalBlockHeight height = %d \n", height)
-	t.Logf("GetLocalBlockHeight hash = %v \n", hash)
-}
+//func TestGetLocalNewBlock(t *testing.T) {
+//	height, hash, _ := tw.GetLocalNewBlock()
+//	t.Logf("GetLocalBlockHeight height = %d \n", height)
+//	t.Logf("GetLocalBlockHeight hash = %v \n", hash)
+//}
 
 // func TestSaveLocalBlockHeight(t *testing.T) {
 // 	bs := NewONTBlockScanner(tw)
@@ -199,25 +199,25 @@ func TestONTBlockScanner_ExtractTransaction(t *testing.T) {
 
 }
 
-func TestWallet_GetRecharges(t *testing.T) {
-	accountID := "WFvvr5q83WxWp1neUMiTaNuH7ZbaxJFpWu"
-	wallet, err := tw.GetWalletInfo(accountID)
-	if err != nil {
-		t.Errorf("GetRecharges failed unexpected error: %v\n", err)
-		return
-	}
-
-	recharges, err := wallet.GetRecharges(false)
-	if err != nil {
-		t.Errorf("GetRecharges failed unexpected error: %v\n", err)
-		return
-	}
-
-	t.Logf("recharges.count = %v", len(recharges))
-	//for _, r := range recharges {
-	//	t.Logf("rechanges.count = %v", len(r))
-	//}
-}
+//func TestWallet_GetRecharges(t *testing.T) {
+//	accountID := "WFvvr5q83WxWp1neUMiTaNuH7ZbaxJFpWu"
+//	wallet, err := tw.GetWalletInfo(accountID)
+//	if err != nil {
+//		t.Errorf("GetRecharges failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	recharges, err := wallet.GetRecharges(false)
+//	if err != nil {
+//		t.Errorf("GetRecharges failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	t.Logf("recharges.count = %v", len(recharges))
+//	//for _, r := range recharges {
+//	//	t.Logf("rechanges.count = %v", len(r))
+//	//}
+//}
 
 //func TestONTBlockScanner_DropRechargeRecords(t *testing.T) {
 //	accountID := "W4ruoAyS5HdBMrEeeHQTBxo4XtaAixheXQ"
@@ -225,17 +225,17 @@ func TestWallet_GetRecharges(t *testing.T) {
 //	bs.DropRechargeRecords(accountID)
 //}
 
-func TestGetUnscanRecords(t *testing.T) {
-	list, err := tw.GetUnscanRecords()
-	if err != nil {
-		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
-		return
-	}
-
-	for _, r := range list {
-		t.Logf("GetUnscanRecords unscan: %v", r)
-	}
-}
+//func TestGetUnscanRecords(t *testing.T) {
+//	list, err := tw.GetUnscanRecords()
+//	if err != nil {
+//		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	for _, r := range list {
+//		t.Logf("GetUnscanRecords unscan: %v", r)
+//	}
+//}
 
 // func TestONTBlockScanner_RescanFailedRecord(t *testing.T) {
 // 	bs := NewONTBlockScanner(tw)
@@ -249,50 +249,50 @@ func TestFullAddress(t *testing.T) {
 		dic[uuid.NewUUID().String()] = uuid.NewUUID().String()
 	}
 }
+//
+//func TestONTBlockScanner_GetTransactionsByAddress(t *testing.T) {
+//	coin := openwallet.Coin{
+//		Symbol:     "BTC",
+//		IsContract: false,
+//	}
+//	txExtractDatas, err := tw.Blockscanner.GetTransactionsByAddress(0, 50, coin, "2N7Mh6PLX39japSF76r2MAf7wT7WKU5TdpK")
+//	if err != nil {
+//		t.Errorf("GetTransactionsByAddress failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	for _, ted := range txExtractDatas {
+//		t.Logf("tx = %v", ted.Transaction)
+//	}
+//
+//}
 
-func TestONTBlockScanner_GetTransactionsByAddress(t *testing.T) {
-	coin := openwallet.Coin{
-		Symbol:     "BTC",
-		IsContract: false,
-	}
-	txExtractDatas, err := tw.Blockscanner.GetTransactionsByAddress(0, 50, coin, "2N7Mh6PLX39japSF76r2MAf7wT7WKU5TdpK")
-	if err != nil {
-		t.Errorf("GetTransactionsByAddress failed unexpected error: %v\n", err)
-		return
-	}
+//func TestGetLocalBlock(t *testing.T) {
+//	db, err := storm.Open(filepath.Join(tw.Config.dbPath, tw.Config.BlockchainFile))
+//	if err != nil {
+//		return
+//	}
+//	defer db.Close()
+//
+//	var blocks []*Block
+//	err = db.All(&blocks)
+//	if err != nil {
+//		log.Error("no find")
+//		return
+//	}
+//	log.Info("blocks = ", len(blocks))
+//}
 
-	for _, ted := range txExtractDatas {
-		t.Logf("tx = %v", ted.Transaction)
-	}
-
-}
-
-func TestGetLocalBlock(t *testing.T) {
-	db, err := storm.Open(filepath.Join(tw.Config.dbPath, tw.Config.BlockchainFile))
-	if err != nil {
-		return
-	}
-	defer db.Close()
-
-	var blocks []*Block
-	err = db.All(&blocks)
-	if err != nil {
-		log.Error("no find")
-		return
-	}
-	log.Info("blocks = ", len(blocks))
-}
-
-func Test_GetTransaction(t *testing.T) {
-	txid := "dc55118ac9442af38a0ec85bcce54a8f8d68ba65de0120a8739d90b9d93b6ca2"
-
-	trans, err := tw.GetTransaction(txid)
-	if err != nil {
-		log.Error("get transaction failed!")
-	} else {
-		log.Info(trans)
-	}
-}
+//func Test_GetTransaction(t *testing.T) {
+//	txid := "dc55118ac9442af38a0ec85bcce54a8f8d68ba65de0120a8739d90b9d93b6ca2"
+//
+//	trans, err := tw.GetTransaction(txid)
+//	if err != nil {
+//		log.Error("get transaction failed!")
+//	} else {
+//		log.Info(trans)
+//	}
+//}
 
 // func Test_tmp(t *testing.T) {
 // 	addr := "AYmuoVvtCojm1F3ATMf2fNww3wBNvAxbi5"

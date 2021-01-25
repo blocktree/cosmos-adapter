@@ -4,17 +4,16 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openw"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openw"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 var (
 	testApp        = "assets-adapter"
 	configFilePath = filepath.Join("conf")
-	dbFilePath = filepath.Join("data", "db")
-	dbFileName = "blockchain-ATOM.db"
-
+	dbFilePath     = filepath.Join("data", "db")
+	dbFileName     = "blockchain-ATOM.db"
 )
 
 func testInitWalletManager() *openw.WalletManager {
@@ -48,7 +47,7 @@ func TestWalletManager_GetWalletInfo(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	wallet, err := tm.GetWalletInfo(testApp, "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt")
+	wallet, err := tm.GetWalletInfo(testApp, "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1")
 	if err != nil {
 		log.Error("unexpected error:", err)
 		return
@@ -77,7 +76,7 @@ func TestWalletManager_CreateAssetsAccount(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
+	walletID := "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1"
 	account := &openwallet.AssetsAccount{Alias: "HELLO ATOM", WalletID: walletID, Required: 1, Symbol: "ATOM", IsTrust: true}
 	account, address, err := tm.CreateAssetsAccount(testApp, walletID, "12345678", account, nil)
 	if err != nil {
@@ -95,7 +94,7 @@ func TestWalletManager_GetAssetsAccountList(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
+	walletID := "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1"
 	list, err := tm.GetAssetsAccountList(testApp, walletID, 0, 10000000)
 	if err != nil {
 		log.Error("unexpected error:", err)
@@ -114,8 +113,8 @@ func TestWalletManager_CreateAddress(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
-	accountID := "4TWktj4La9AqL6DTEuUFhzkXQcrBnW1qBeZmtj1g5eKg"
+	walletID := "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1"
+	accountID := "Ghg4iiBJubjaTDDfLxa1jAM65gX56s8xjpdy5shitVe9"
 	address, err := tm.CreateAddress(testApp, walletID, accountID, 1)
 	if err != nil {
 		log.Error(err)
@@ -131,8 +130,8 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 
 	tm := testInitWalletManager()
 
-	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
-	accountID := "55VyfKAycMRRSY8t3jpH97a1EwSikfe5N9h69wfF4ETH"
+	walletID := "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1"
+	accountID := "Ghg4iiBJubjaTDDfLxa1jAM65gX56s8xjpdy5shitVe9"
 	list, err := tm.GetAddressList(testApp, walletID, accountID, 0, -1, false)
 	if err != nil {
 		log.Error("unexpected error:", err)
@@ -140,6 +139,7 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 	}
 	for i, w := range list {
 		log.Info("address[", i, "] :", w.Address)
+		log.Info("public key [", i, "] :", w.PublicKey)
 	}
 	log.Info("address count:", len(list))
 

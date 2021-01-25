@@ -23,8 +23,8 @@ import (
 	"time"
 
 	owcrypt "github.com/blocktree/go-owcrypt"
-	"github.com/blocktree/openwallet/crypto"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/crypto"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/tidwall/gjson"
 )
@@ -115,11 +115,11 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 				for _, coin := range input.Get("coins").Array() {
 					if coin.Get("denom").String() == denom {
 						obj.TxValue = append(obj.TxValue, TxValue{
-							From: input.Get("address").String(),
-							To:   "multiaddress",
+							From:   input.Get("address").String(),
+							To:     "multiaddress",
 							Amount: coin.Get("amount").Uint(),
 							Status: status,
-							Reason:reason,
+							Reason: reason,
 						})
 					}
 				}
@@ -129,11 +129,11 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 				for _, coin := range output.Get("coins").Array() {
 					if coin.Get("denom").String() == denom {
 						obj.TxValue = append(obj.TxValue, TxValue{
-							From: "multiaddress",
-							To: output.Get("address").String(),
+							From:   "multiaddress",
+							To:     output.Get("address").String(),
 							Amount: coin.Get("amount").Uint(),
 							Status: status,
-							Reason:reason,
+							Reason: reason,
 						})
 					}
 				}

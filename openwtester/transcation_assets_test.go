@@ -20,10 +20,10 @@ import (
 	"testing"
 
 	"github.com/blocktree/cosmos-adapter/cosmos"
-	"github.com/blocktree/openwallet/openw"
+	"github.com/blocktree/openwallet/v2/openw"
 
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 func testGetAssetsAccountBalance(tm *openw.WalletManager, walletID, accountID string) {
@@ -52,7 +52,7 @@ func testCreateTransactionStep(tm *openw.WalletManager, walletID, accountID, to,
 	//	return nil, err
 	//}
 
-	rawTx, err := tm.CreateTransaction(testApp, walletID, accountID, amount, to, feeRate, "", contract)
+	rawTx, err := tm.CreateTransaction(testApp, walletID, accountID, amount, to, feeRate, "", contract, nil)
 
 	if err != nil {
 		log.Error("CreateTransaction failed, unexpected error:", err)

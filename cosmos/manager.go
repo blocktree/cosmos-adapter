@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/blocktree/openwallet/hdkeystore"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/hdkeystore"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 type WalletManager struct {
@@ -50,7 +50,7 @@ func NewWalletManager() *WalletManager {
 	wm.WalletsInSum = make(map[string]*openwallet.Wallet)
 	//区块扫描器
 	wm.Blockscanner = NewATOMBlockScanner(&wm)
-	wm.Decoder = NewAddressDecoder(&wm)
+	wm.Decoder = NewAddressDecoderV2(&wm)
 	wm.TxDecoder = NewTransactionDecoder(&wm)
 	wm.Log = log.NewOWLogger(wm.Symbol())
 	wm.ContractDecoder = NewContractDecoder(&wm)
@@ -108,6 +108,5 @@ func (wm *WalletManager) sendRawTransactionByNode(txHex string) (string, error) 
 		return "", err
 	}
 
-	
 	return txid, nil
 }

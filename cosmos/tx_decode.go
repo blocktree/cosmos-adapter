@@ -26,9 +26,9 @@ import (
 
 	"github.com/blocktree/go-owcdrivers/cosmosTransaction"
 	owcrypt "github.com/blocktree/go-owcrypt"
-	ow "github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	ow "github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/tidwall/gjson"
 )
 
@@ -159,7 +159,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 				countList = append(countList, a.Balance.Sub(a.Balance, count.Sub(count, amount)).Uint64())
 				log.Error("The ATOM of the account is enough,"+
 					" but cannot be sent in just one transaction!\n"+
-					"the amount can be sent in "+string(len(countList))+
+					"the amount can be sent in "+fmt.Sprint(len(countList))+
 					"times with amounts :\n"+strings.Replace(strings.Trim(fmt.Sprint(countList), "[]"), " ", ",", -1), err)
 				return err
 			} else {
