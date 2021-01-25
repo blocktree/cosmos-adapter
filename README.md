@@ -9,7 +9,7 @@ openwtester包下的测试用例已经集成了openwallet钱包体系，创建co
 ```ini
 
 # transaction type
-txType = "auth/StdTx"
+txType = "cosmos-sdk/StdTx"
 # message type
 msgSend = "cosmos-sdk/MsgSend"
 msgVote = "cosmos-sdk/MsgVote"
@@ -23,7 +23,7 @@ mainnetRestAPI = "http://127.0.0.1:1317"
 # mainnet node api url
 mainnetNodeAPI = "http://127.0.0.1:26657"
 # chain id
-mainnetChainID = "cosmoshub-2"
+mainnetChainID = "cosmoshub-3"
 # mainnet denom
 mainnetDenom = "uatom"
 
