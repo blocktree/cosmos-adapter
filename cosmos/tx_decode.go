@@ -200,7 +200,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 	if sequenceChain > int(sequence) {
 		sequence = uint64(sequenceChain)
 	}
-	memo := ""
+	memo := rawTx.GetExtParam().Get("memo").String()
 
 	messageType := decoder.wm.Config.MsgType
 
