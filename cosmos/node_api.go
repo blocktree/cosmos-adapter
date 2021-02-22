@@ -188,7 +188,7 @@ func (c *Client) getBlockHash(height uint64) (string, error) {
 		return "", err
 	}
 
-	return resp.Get("block_meta").Get("block_id").Get("hash").String(), nil
+	return resp.Get("block_id").Get("hash").String(), nil
 }
 
 func (c *Client) getAccountNumberAndSequence(address string) (int, int, error) {
