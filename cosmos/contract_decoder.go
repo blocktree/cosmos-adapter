@@ -12,6 +12,7 @@ import (
 
 type AddrBalance struct {
 	Address string
+	PublicKey string
 	Balance *big.Int
 	index   int
 }

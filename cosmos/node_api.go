@@ -17,11 +17,12 @@ package cosmos
 
 import (
 	"encoding/base64"
-	"encoding/json"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
+	"strings"
 
 	"github.com/blocktree/openwallet/v2/log"
 	"github.com/imroc/req"
@@ -173,7 +174,7 @@ func (c *Client) getBlockHeight() (uint64, error) {
 		return 0, err
 	}
 
-	return resp.Get("block_meta").Get("header").Get("height").Uint(), nil
+	return resp.Get("block").Get("header").Get("height").Uint(), nil
 }
 
 // 通过高度获取区块哈希
@@ -256,14 +257,20 @@ func (c *Client) getBlockByHeight(height uint64) (*Block, error) {
 	return NewBlock(resp), nil
 }
 
-func (c *Client) sendTransaction(jsonStr string) (string, error) {
+func (c *Client) sendTransaction(txBytes string) (string, error) {
 
-	// sequence := gjson.Get(jsonStr, "tx").Get("signatures").Array()[0].Get("sequence").Uint()
-	// from := gjson.Get(jsonStr, "tx").Get("msg").Array()[0].Get("value").Get("from_address").String()
-	path := "/txs"
+	path := "/cosmos/tx/v1beta1/txs"
+	var (
+		dat = make(map[string]interface{}, 0)
+	)
+	txstrs := strings.Split(txBytes, ":")
+	if len(txstrs) != 2 {
+		return "", errors.New("invalid data")
+	}
+	tx_bytes, _ := hex.DecodeString(txstrs[0])
 
-	var dat map[string]interface{}
-	json.Unmarshal([]byte(jsonStr), &dat)
+	dat["tx_bytes"] = tx_bytes
+	dat["mode"] = "BROADCAST_MODE_SYNC"
 
 	resp, err := c.Call(path, req.BodyJSON(&dat), "POST")
 	if err != nil {
@@ -273,18 +280,5 @@ func (c *Client) sendTransaction(jsonStr string) (string, error) {
 		return "", errors.New("send transaction failed with error:" + resp.Get("raw_log").String())
 	}
 
-	// timeCount := 1
-	// for {
-	// 	time.Sleep(time.Second * 5)
-	// 	_, sequenceNew, _ := c.getAccountNumberAndSequence(from)
-	// 	if sequenceNew > int(sequence) {
-	// 		break
-	// 	} else {
-	// 		timeCount++
-	// 		if timeCount == 120 {
-	// 			return "", errors.New("Submit transaction failed!")
-	// 		}
-	// 	}
-	// }
-	return resp.Get("txhash").String(), nil
+	return resp.Get("tx_response").Get("txhash").String(), nil
 }

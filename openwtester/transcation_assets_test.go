@@ -52,7 +52,7 @@ func testCreateTransactionStep(tm *openw.WalletManager, walletID, accountID, to,
 	//	return nil, err
 	//}
 
-	rawTx, err := tm.CreateTransaction(testApp, walletID, accountID, amount, to, feeRate, "", contract, nil)
+	rawTx, err := tm.CreateTransaction(testApp, walletID, accountID, amount, to, feeRate, "123456", contract, nil)
 
 	if err != nil {
 		log.Error("CreateTransaction failed, unexpected error:", err)
@@ -122,14 +122,14 @@ func testSubmitTransactionStep(tm *openw.WalletManager, rawTx *openwallet.RawTra
 
 func TestTransfer(t *testing.T) {
 	tm := testInitWalletManager()
-	walletID := "W55YrKxDiRwEjbKtDQ9xrD9nxLWTdxaRxt"
-	accountID := "4TWktj4La9AqL6DTEuUFhzkXQcrBnW1qBeZmtj1g5eKg"
-	to := "cosmos1eyqnh4ulw9dvyagchhc06mrelcvyh45ppne6ju"
-	//to := "cosmos1u03rh4fk8wf4umdn6wzu5pqs83vjg85t6zmmql"
+	walletID := "WFqzXegaCLogvGHy61zmseR2fDzHkDr6D1"
+	accountID := "Ghg4iiBJubjaTDDfLxa1jAM65gX56s8xjpdy5shitVe9"
+	//to := "cosmos1fsdd4kuv823nx703xndfmzay0cjhlamyz0urxg"
+	to := "cosmos1kag2d0wkk34qdqm5h3tk03xqewt63xv5z6m56c"
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.01", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.001", "", nil)
 	if err != nil {
 		return
 	}
@@ -151,72 +151,72 @@ func TestTransfer(t *testing.T) {
 		return
 	}
 
-	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.02", "", nil)
-	if err != nil {
-		return
-	}
-
-	log.Std.Info("rawTx: %+v", rawTx)
-
-	_, err = testSignTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testVerifyTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
-	if err != nil {
-		return
-	}
-
-	log.Std.Info("rawTx: %+v", rawTx)
-
-	_, err = testSignTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testVerifyTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
-	if err != nil {
-		return
-	}
-
-	log.Std.Info("rawTx: %+v", rawTx)
-
-	_, err = testSignTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testVerifyTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
-	//	getdata("cosmos1z9k73l7trgshqpgg7m6hk9ehe4gphea5ch9dyh")
+	//rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.02", "", nil)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//log.Std.Info("rawTx: %+v", rawTx)
+	//
+	//_, err = testSignTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testVerifyTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testSubmitTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//log.Std.Info("rawTx: %+v", rawTx)
+	//
+	//_, err = testSignTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testVerifyTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testSubmitTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//rawTx, err = testCreateTransactionStep(tm, walletID, accountID, to, "0.06", "", nil)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//log.Std.Info("rawTx: %+v", rawTx)
+	//
+	//_, err = testSignTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testVerifyTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//_, err = testSubmitTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
+	////	getdata("cosmos1z9k73l7trgshqpgg7m6hk9ehe4gphea5ch9dyh")
 
 }
 func getdata(addr string) {

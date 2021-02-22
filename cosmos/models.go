@@ -19,7 +19,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"strings"
 	"time"
 
 	owcrypt "github.com/blocktree/go-owcrypt"
@@ -80,11 +79,11 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 	reason := ""
 	var status string
 
-	if strings.Contains(json.Get("raw_log").String(), "true") {
+	//if strings.Contains(json.Get("raw_log").String(), "true") {
 		status = "true"
-	} else {
-		status = "false"
-	}
+	//} else {
+	//	status = "false"
+	//}
 	if logList == nil || len(logList) == 0 {
 		reason = gjson.Get(json.Get("raw_log").String(), "message").String()
 		status = "false"
@@ -158,23 +157,23 @@ func NewBlock(json *gjson.Result) *Block {
 	obj := &Block{}
 
 	// 解析
-	obj.Hash = gjson.Get(json.Raw, "block_meta").Get("block_id").Get("hash").String()
-	obj.VersionBlock = byte(gjson.Get(json.Raw, "block_meta").Get("header").Get("version").Get("block").Uint())
-	obj.VersionApp = byte(gjson.Get(json.Raw, "block_meta").Get("header").Get("version").Get("app").Uint())
-	obj.ChainID = gjson.Get(json.Raw, "block_meta").Get("header").Get("chain_id").String()
-	obj.Height = gjson.Get(json.Raw, "block_meta").Get("header").Get("height").Uint()
-	timestamp, _ := time.Parse(time.RFC3339Nano, gjson.Get(json.Raw, "block_meta").Get("header").Get("time").String())
+	obj.Hash = gjson.Get(json.Raw, "block_id").Get("hash").String()
+	obj.VersionBlock = byte(gjson.Get(json.Raw, "block").Get("header").Get("version").Get("block").Uint())
+	//obj.VersionApp = byte(gjson.Get(json.Raw, "block_meta").Get("header").Get("version").Get("app").Uint())
+	obj.ChainID = gjson.Get(json.Raw, "block").Get("header").Get("chain_id").String()
+	obj.Height = gjson.Get(json.Raw, "block").Get("header").Get("height").Uint()
+	timestamp, _ := time.Parse(time.RFC3339Nano, gjson.Get(json.Raw, "block").Get("header").Get("time").String())
 	obj.Timestamp = uint64(timestamp.Unix())
-	obj.PrevBlockHash = gjson.Get(json.Raw, "block_meta").Get("header").Get("last_block_id").Get("hash").String()
+	obj.PrevBlockHash = gjson.Get(json.Raw, "block").Get("header").Get("last_block_id").Get("hash").String()
 
-	if gjson.Get(json.Raw, "block_meta").Get("header").Get("num_txs").Uint() != 0 {
+	//if gjson.Get(json.Raw, "block_meta").Get("header").Get("num_txs").Uint() != 0 {
 		txs := gjson.Get(json.Raw, "block").Get("data").Get("txs").Array()
 
 		for _, tx := range txs {
 			txid, _ := base64.StdEncoding.DecodeString(tx.String())
 			obj.Transactions = append(obj.Transactions, hex.EncodeToString(owcrypt.Hash(txid, 0, owcrypt.HASH_ALG_SHA256)))
 		}
-	}
+	//}
 
 	return obj
 }

@@ -17,19 +17,16 @@ package cosmos
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"math/big"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/blocktree/go-owcdrivers/cosmosTransaction"
-	owcrypt "github.com/blocktree/go-owcrypt"
 	ow "github.com/blocktree/openwallet/v2/common"
 	"github.com/blocktree/openwallet/v2/log"
 	"github.com/blocktree/openwallet/v2/openwallet"
-	"github.com/tidwall/gjson"
 )
 
 type TransactionDecoder struct {
@@ -73,8 +70,10 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 		fmt.Println("Tx to send: ", rawTx.RawHex)
 		return nil, err
 	} else {
-		sequence := gjson.Get(rawTx.RawHex, "tx").Get("signatures").Array()[0].Get("sequence").Uint() + 1
-		wrapper.SetAddressExtParam(gjson.Get(rawTx.RawHex, "tx").Get("msg").Array()[0].Get("value").Get("from_address").String(), decoder.wm.FullName(), sequence)
+		addr_seq := strings.Split(rawTx.RawHex, ":")[1]
+		data := strings.Split(addr_seq, "@")
+		sequence, _  := strconv.Atoi(data[1])
+		wrapper.SetAddressExtParam(data[0], decoder.wm.FullName(), sequence + 1)
 	}
 
 	rawTx.TxID = txid
@@ -119,7 +118,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 		if err != nil {
 			return err
 		}
-
+		balance.PublicKey = addr.PublicKey
 		balance.index = i
 		addressesBalanceList = append(addressesBalanceList, *balance)
 	}
@@ -150,6 +149,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 	amount := big.NewInt(int64(convertFromAmount(amountStr)))
 	amount = amount.Add(amount, big.NewInt(int64(fee)))
 	from := ""
+	fromPub := ""
 	count := big.NewInt(0)
 	countList := []uint64{}
 	for _, a := range addressesBalanceList {
@@ -168,6 +168,7 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 			continue
 		}
 		from = a.Address
+		fromPub = a.PublicKey
 		break
 	}
 
@@ -202,13 +203,23 @@ func (decoder *TransactionDecoder) CreateATOMRawTransaction(wrapper openwallet.W
 	}
 	memo := rawTx.GetExtParam().Get("memo").String()
 
-	messageType := decoder.wm.Config.MsgType
+	cosmosTx := CosmosTx{
+		From:      from,
+		To:        to,
+		Denom:     denom,
+		FeeDenom:  denom,
+		Memo:      memo,
+		ChainID:   chainID,
+		PublicKey: fromPub,
+		Amount:    int64(convertFromAmount(amountStr)),
+		Fee:       int64(fee),
+		AccNum:    uint64(accountNumber),
+		AccSeq:    uint64(sequence),
+		GasLimit:  gas,
+		Timeout:   0,
+	}
 
-	txFee := cosmosTransaction.NewStdFee(int64(gas), cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(fee))})
-	message := []cosmosTransaction.Message{cosmosTransaction.NewMessage(messageType, cosmosTransaction.NewMsgSend(from, to, cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(convertFromAmount(amountStr)))}))}
-	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, int(sequence), &txFee, message)
-
-	emptyTrans, hash, err := txStruct.CreateEmptyTransactionAndHash()
+	emptyTrans, hash, err := cosmosTx.getUnsignedTxAndHash()
 	if err != nil {
 		return err
 	}
@@ -261,7 +272,7 @@ func (decoder *TransactionDecoder) SignATOMRawTransaction(wrapper openwallet.Wal
 
 			//签名交易
 			/////////交易单哈希签名
-			sig, err := cosmosTransaction.SignTransactionHash(keySignature.Message, keyBytes)
+			sig, err := signTransactionHash(keySignature.Message, keyBytes)
 			if err != nil {
 				return fmt.Errorf("transaction hash sign failed, unexpected error: %v", err)
 			} else {
@@ -307,14 +318,9 @@ func (decoder *TransactionDecoder) VerifyATOMRawTransaction(wrapper openwallet.W
 			log.Debug("PublicKey:", hex.EncodeToString(pubkey))
 		}
 	}
-	point := owcrypt.PointDecompress(pubkey, decoder.wm.CurveType())[1:]
-	pass := cosmosTransaction.VerifyTransactionSig(emptyTrans, signature, point)
-	var txStruct cosmosTransaction.TxStruct
-	json.Unmarshal([]byte(emptyTrans), &txStruct)
-	keyType := "tendermint/PubKeySecp256k1"
-	snedmode := "sync" //"block"
-	signedTrans, err := txStruct.CreateJsonForSend(signature, pubkey, keyType, snedmode)
 
+	signedTrans, err := getBroadcastBytes(emptyTrans, signature)
+	pass := true
 	if err != nil {
 		return fmt.Errorf("transaction compose signatures failed")
 	}
@@ -322,7 +328,7 @@ func (decoder *TransactionDecoder) VerifyATOMRawTransaction(wrapper openwallet.W
 	if pass {
 		log.Debug("transaction verify passed")
 		rawTx.IsCompleted = true
-		rawTx.RawHex = signedTrans.Raw
+		rawTx.RawHex = signedTrans
 	} else {
 		log.Debug("transaction verify failed")
 		rawTx.IsCompleted = false
@@ -465,7 +471,7 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 	if err != nil {
 		return err
 	}
-	//fromPubkey := fromAddr.PublicKey
+	fromPubkey := fromAddr.PublicKey
 
 	rawTx.TxFrom = []string{from}
 	rawTx.TxTo = []string{to}
@@ -494,12 +500,23 @@ func (decoder *TransactionDecoder) createRawTransaction(wrapper openwallet.Walle
 	}
 	memo := ""
 
-	messageType := decoder.wm.Config.MsgType
+	cosmosTx := CosmosTx{
+		From:      from,
+		To:        to,
+		Denom:     denom,
+		FeeDenom:  denom,
+		Memo:      memo,
+		ChainID:   chainID,
+		PublicKey: fromPubkey,
+		Amount:    int64(convertFromAmount(amountStr)),
+		Fee:       int64(fee),
+		AccNum:    uint64(accountNumber),
+		AccSeq:    uint64(sequence),
+		GasLimit:  gas,
+		Timeout:   0,
+	}
 
-	txFee := cosmosTransaction.NewStdFee(int64(gas), cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(fee))})
-	message := []cosmosTransaction.Message{cosmosTransaction.NewMessage(messageType, cosmosTransaction.NewMsgSend(from, to, cosmosTransaction.Coins{cosmosTransaction.NewCoin(denom, int64(convertFromAmount(amountStr)))}))}
-	txStruct := cosmosTransaction.NewTxStruct(chainID, memo, accountNumber, int(sequence), &txFee, message)
-	emptyTrans, hash, err := txStruct.CreateEmptyTransactionAndHash()
+	emptyTrans, hash, err := cosmosTx.getUnsignedTxAndHash()
 	if err != nil {
 		return err
 	}

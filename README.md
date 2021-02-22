@@ -7,7 +7,6 @@
 openwtester包下的测试用例已经集成了openwallet钱包体系，创建conf文件，新建ATOM.ini文件，编辑如下内容：
 
 ```ini
-
 # transaction type
 txType = "cosmos-sdk/StdTx"
 # message type
@@ -19,33 +18,33 @@ msgType = 1
 
 
 # mainnet rest api url
-mainnetRestAPI = "http://127.0.0.1:1317"
+mainnetRestAPI = "http://ip:port"
 # mainnet node api url
-mainnetNodeAPI = "http://127.0.0.1:26657"
+mainnetNodeAPI = "http://ip:port"
 # chain id
-mainnetChainID = "cosmoshub-3"
+mainnetChainID = "cosmoshub-4"
 # mainnet denom
 mainnetDenom = "uatom"
 
 # testnet rest api url
-testnetRestAPI = "http://192.168.27.124:20042"
+testnetRestAPI = "http://ip:port"
 # testnet node api url
-testnetNodeAPI = "http://192.168.27.124:20041"
+testnetNodeAPI = "http://ip:port"
 # chain id
 testnetChainID = "gaia-13003"
 # testnet denom
 testnetDenom = "muon"
 
 # Is network test?
-isTestNet = true
+isTestNet = false
 
 # scan mempool or not
-isScanMemPool = false
+isScanMemPool = true
 
 # pay fee or not
-payFee = false
+payFee = true
 # minimum fee to pay in muon/uatom(1 mon = 1000000muon , 1 atom = 1000000uatom)
-minFee = 1000
+minFee = 2500
 # standed gas
 stdGas = 200000
 
