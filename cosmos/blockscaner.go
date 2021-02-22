@@ -803,11 +803,11 @@ func (bs *ATOMBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, er
 
 	var (
 		blockHeight uint64 = 0
-		hash        string
+		block       *Block
 		err         error
 	)
 
-	blockHeight, hash, err = bs.wm.Blockscanner.GetLocalNewBlock()
+	blockHeight, _, err = bs.wm.Blockscanner.GetLocalNewBlock()
 	if err != nil {
 		bs.wm.Log.Errorf("get local new block failed, err=%v", err)
 		return nil, err
@@ -824,16 +824,14 @@ func (bs *ATOMBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, er
 		//就上一个区块链为当前区块
 		blockHeight = blockHeight - 1
 
-		block, err := bs.wm.RestClient.getBlockByHeight(blockHeight)
-		if err != nil {
-			bs.wm.Log.Errorf("get block spec by block number failed, err=%v", err)
-			return nil, err
-		}
-
-		hash = block.Hash
+	}
+	block, err = bs.wm.RestClient.getBlockByHeight(blockHeight)
+	if err != nil {
+		bs.wm.Log.Errorf("get block spec by block number failed, err=%v", err)
+		return nil, err
 	}
 
-	return &openwallet.BlockHeader{Height: blockHeight, Hash: hash}, nil
+	return block.BlockHeader(), nil
 }
 
 //GetScannedBlockHeight 获取已扫区块高度
