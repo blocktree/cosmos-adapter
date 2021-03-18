@@ -68,14 +68,14 @@ type Transaction struct {
 func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transaction {
 
 	obj := &Transaction{}
-	obj.TxType = json.Get("tx").Get("type").String()
-	if obj.TxType != txType {
-		return &Transaction{}
-	}
+	obj.TxType = ""
+	//if obj.TxType != txType {
+	//	return &Transaction{}
+	//}
 
-	msgList := json.Get("tx").Get("value").Get("msg").Array()
-	feeList := json.Get("tx").Get("value").Get("fee").Get("amount").Array()
-	logList := json.Get("logs").Array()
+	msgList := json.Get("tx").Get("body").Get("messages").Array()
+	feeList := json.Get("tx").Get("auth_info").Get("fee").Get("amount").Array()
+	logList := json.Get("tx_response").Get("logs").Array()
 	reason := ""
 	var status string
 
@@ -89,12 +89,12 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 		status = "false"
 	}
 	for _, msg := range msgList {
-		if msg.Get("type").String() == msgType {
-			for _, coin := range msg.Get("value").Get("amount").Array() {
+		if msg.Get("@type").String() == msgType {
+			for _, coin := range msg.Get("amount").Array() {
 				if coin.Get("denom").String() == denom {
 					obj.TxValue = append(obj.TxValue, TxValue{
-						From:   msg.Get("value").Get("from_address").String(),
-						To:     msg.Get("value").Get("to_address").String(),
+						From:   msg.Get("from_address").String(),
+						To:     msg.Get("to_address").String(),
 						Amount: coin.Get("amount").Uint(),
 						Status: status,
 						Reason: reason,
@@ -144,12 +144,13 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 			}
 		}
 	}
-	obj.Gas = json.Get("tx").Get("value").Get("fee").Get("gas").Uint()
-	obj.TxID = json.Get("txhash").String()
-	timestamp, _ := time.Parse(time.RFC3339Nano, json.Get("timestamp").String())
-	obj.TimeStamp = uint64(timestamp.Unix())
-	obj.BlockHeight = json.Get("height").Uint()
-	obj.Memo = json.Get("tx").Get("value").Get("memo").String()
+	obj.Gas = json.Get("tx_response").Get("gas_used").Uint()
+	obj.TxID = json.Get("tx_response").Get("txhash").String()
+	//timestamp, _ := time.Parse(time.RFC3339Nano, json.Get("timestamp").String())
+	//obj.TimeStamp = uint64(timestamp.Unix())
+	obj.TimeStamp = json.Get("tx_response").Get("timestamp").Uint()
+	obj.BlockHeight = json.Get("tx_response").Get("height").Uint()
+	obj.Memo = json.Get("tx").Get("body").Get("memo").String()
 	return obj
 }
 

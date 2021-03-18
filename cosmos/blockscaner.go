@@ -952,7 +952,7 @@ func (wm *WalletManager) GetTransactionInMemPool(txid string) (*Transaction, err
 //GetTransaction 获取交易单
 func (wm *WalletManager) GetTransaction(txid string) (*Transaction, error) {
 
-	path := "/txs/" + txid
+	path := "/cosmos/tx/v1beta1/txs/" + txid
 	trans, err := wm.RestClient.Call(path, nil, "GET")
 
 	if err != nil {
