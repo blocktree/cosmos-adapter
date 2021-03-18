@@ -90,6 +90,7 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 	}
 	for _, msg := range msgList {
 		if msg.Get("@type").String() == msgType {
+			obj.TxType = "cosmos-sdk/StdTx"
 			for _, coin := range msg.Get("amount").Array() {
 				if coin.Get("denom").String() == denom {
 					obj.TxValue = append(obj.TxValue, TxValue{
@@ -144,6 +145,11 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 			}
 		}
 	}
+
+	if obj.TxType != txType {
+		return &Transaction{}
+	}
+
 	obj.Gas = json.Get("tx_response").Get("gas_used").Uint()
 	obj.TxID = json.Get("tx_response").Get("txhash").String()
 	//timestamp, _ := time.Parse(time.RFC3339Nano, json.Get("timestamp").String())
