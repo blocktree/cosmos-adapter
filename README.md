@@ -10,7 +10,7 @@ openwtester包下的测试用例已经集成了openwallet钱包体系，创建co
 # transaction type
 txType = "cosmos-sdk/StdTx"
 # message type
-msgSend = "cosmos-sdk/MsgSend"
+msgSend = "/cosmos.bank.v1beta1.MsgSend"
 msgVote = "cosmos-sdk/MsgVote"
 msgDelegate = "cosmos-sdk/MsgDelegate"
 # message choose 1-send  2-vote  3-delegate
