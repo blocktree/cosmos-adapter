@@ -110,8 +110,9 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 			}
 
 		}
-		if msg.Get("type").String() == "cosmos-sdk/MsgMultiSend" {
-			for _, input := range msg.Get("value").Get("inputs").Array() {
+		if msg.Get("@type").String() == "/cosmos.bank.v1beta1.MsgMultiSend" {
+			obj.TxType = "cosmos-sdk/StdTx"
+			for _, input := range msg.Get("inputs").Array() {
 				for _, coin := range input.Get("coins").Array() {
 					if coin.Get("denom").String() == denom {
 						obj.TxValue = append(obj.TxValue, TxValue{
@@ -125,7 +126,7 @@ func NewTransaction(json *gjson.Result, txType, msgType, denom string) *Transact
 				}
 			}
 
-			for _, output := range msg.Get("value").Get("outputs").Array() {
+			for _, output := range msg.Get("outputs").Array() {
 				for _, coin := range output.Get("coins").Array() {
 					if coin.Get("denom").String() == denom {
 						obj.TxValue = append(obj.TxValue, TxValue{
