@@ -276,12 +276,8 @@ func (c *Client) sendTransaction(txBytes string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if resp.Get("tx_response").Get("raw_log").String() != "[]" {
+	if resp.Get("tx_response").Get("code").Uint() != 0 && resp.Get("tx_response").Get("raw_log").String() != "[]" {
 		return "", errors.New(resp.Get("tx_response").Get("raw_log").String())
-	}
-
-	if resp.Get("code").Uint() != 0 && resp.Get("raw_log").String() != "" {
-		return "", errors.New("send transaction failed with error:" + resp.Get("raw_log").String())
 	}
 
 	return resp.Get("tx_response").Get("txhash").String(), nil
